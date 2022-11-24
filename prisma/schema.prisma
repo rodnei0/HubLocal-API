@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  email    String   @unique
+  password String
+  tickets  Ticket[]
+
+  @@map("users")
+}
+
+model Company {
+  id           Int           @id @default(autoincrement())
+  name         String        @unique
+  cnpj         String        @unique
+  description  String
+  locations    Location[]
+  responsibles Responsible[]
+
+  @@map("company")
+}
+
+model Location {
+  id           Int           @id @default(autoincrement())
+  name         String        @unique
+  address      String
+  description  String
+  company      Company       @relation(fields: [companyId], references: [id])
+  companyId    Int           @unique
+  responsibles Responsible[]
+  Ticket       Ticket[]
+
+  @@map("location")
+}
+
+model Responsible {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  address    String
+  phone      String
+  in_charge  Boolean
+  company    Company  @relation(fields: [companyId], references: [id])
+  companyId  Int      @unique
+  location   Location @relation(fields: [locationId], references: [id])
+  locationId Int      @unique
+
+  @@map("responsible")
+}
+
+model Ticket {
+  id            Int      @id
+  title         String   @unique
+  creation_date DateTime
+  update_date   DateTime
+  user          User     @relation(fields: [userId], references: [id])
+  userId        Int      @unique
+  location      Location @relation(fields: [locationId], references: [id])
+  locationId    Int      @unique
+  status        Status   @default(PENDENTE)
+
+  @@map("tickets")
+}
+
+enum Status {
+  PENDENTE
+  PROGRESSO
+  CONCLUIDO
+}
