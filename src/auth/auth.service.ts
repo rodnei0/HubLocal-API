@@ -4,8 +4,8 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { User, Prisma } from '@prisma/client';
+import { PrismaService } from '../prisma.service';
+import { Users, Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 
@@ -13,13 +13,13 @@ import * as jwt from 'jsonwebtoken';
 export class AuthService {
   constructor(private prisma: PrismaService) {}
 
-  async createUser(data: Prisma.UserCreateInput): Promise<User> {
+  async createUser(data: Prisma.UsersCreateInput): Promise<Users> {
     const user = await this.findUser(data);
     if (user) throw new ConflictException('Email já cadastrado!');
 
     const hashedPassword = bcrypt.hashSync(data.password, 12);
 
-    return this.prisma.user.create({
+    return this.prisma.users.create({
       data: {
         email: data.email,
         password: hashedPassword,
@@ -27,7 +27,7 @@ export class AuthService {
     });
   }
 
-  async sigIn(data: Prisma.UserCreateInput): Promise<string> {
+  async sigIn(data: Prisma.UsersCreateInput): Promise<string> {
     const user = await this.findUser(data);
     if (!user) throw new NotFoundException('Usuário não existe!');
 
@@ -37,6 +37,7 @@ export class AuthService {
     const token = jwt.sign(
       {
         id: user.id,
+        exp: Math.floor(Date.now() / 1000) + 60 * 60,
       },
       process.env.JWT_SECRET,
     );
@@ -45,9 +46,9 @@ export class AuthService {
   }
 
   async findUser(
-    userWhereUniqueInput: Prisma.UserWhereUniqueInput,
-  ): Promise<User | null> {
-    return this.prisma.user.findUnique({
+    userWhereUniqueInput: Prisma.UsersWhereUniqueInput,
+  ): Promise<Users | null> {
+    return this.prisma.users.findUnique({
       where: {
         email: userWhereUniqueInput.email,
       },

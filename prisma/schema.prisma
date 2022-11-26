@@ -10,65 +10,83 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id       Int      @id @default(autoincrement())
-  email    String   @unique
-  password String
-  tickets  Ticket[]
+model Users {
+  id             Int       @id @default(autoincrement())
+  email          String    @unique
+  password       String
+  createdTickets Tickets[] @relation("createdBy")
+  updatedTickets Tickets[] @relation("updatedBy")
 
   @@map("users")
 }
 
-model Company {
-  id           Int           @id @default(autoincrement())
-  name         String        @unique
-  cnpj         String        @unique
+model Companies {
+  id           Int            @id @default(autoincrement())
+  name         String
+  cnpj         String         @unique
   description  String
-  locations    Location[]
-  responsibles Responsible[]
+  locations    Locations[]
+  responsibles Responsibles[]
 
-  @@map("company")
+  @@map("companies")
 }
 
-model Location {
-  id           Int           @id @default(autoincrement())
-  name         String        @unique
-  address      String
+model Locations {
+  id           Int            @id @default(autoincrement())
+  name         String         @unique
   description  String
-  company      Company       @relation(fields: [companyId], references: [id])
-  companyId    Int           @unique
-  responsibles Responsible[]
-  Ticket       Ticket[]
+  address      Addresses      @relation(fields: [adressId], references: [id])
+  adressId     Int
+  company      Companies      @relation(fields: [companyId], references: [id])
+  companyId    Int
+  responsibles Responsibles[]
+  Ticket       Tickets[]
 
-  @@map("location")
+  @@map("locations")
 }
 
-model Responsible {
-  id         Int      @id @default(autoincrement())
-  name       String   @unique
-  address    String
+model Responsibles {
+  id         Int        @id @default(autoincrement())
+  name       String
   phone      String
-  in_charge  Boolean
-  company    Company  @relation(fields: [companyId], references: [id])
-  companyId  Int      @unique
-  location   Location @relation(fields: [locationId], references: [id])
-  locationId Int      @unique
+  cpf        String     @unique
+  isIncharge Boolean?   @default(true)
+  address    Addresses  @relation(fields: [addressId], references: [id])
+  addressId  Int
+  company    Companies? @relation(fields: [companyId], references: [id])
+  companyId  Int?
+  location   Locations? @relation(fields: [locationId], references: [id])
+  locationId Int?
 
   @@map("responsible")
 }
 
-model Ticket {
-  id            Int      @id
-  title         String   @unique
+model Tickets {
+  id            Int       @id @default(autoincrement())
+  title         String    @unique
   creation_date DateTime
   update_date   DateTime
-  user          User     @relation(fields: [userId], references: [id])
-  userId        Int      @unique
-  location      Location @relation(fields: [locationId], references: [id])
-  locationId    Int      @unique
-  status        Status   @default(PENDENTE)
+  createdBy     Users     @relation(name: "createdBy", fields: [createdById], references: [id])
+  createdById   Int
+  updatedBy     Users?    @relation(name: "updatedBy", fields: [updateById], references: [id])
+  updateById    Int?
+  location      Locations @relation(fields: [locationId], references: [id])
+  locationId    Int
+  status        Status    @default(PENDENTE)
 
   @@map("tickets")
+}
+
+model Addresses {
+  id          Int            @id @default(autoincrement())
+  street      String
+  number      String
+  district    String
+  city        String
+  state       String
+  zipcode     String         @unique
+  responsible Responsibles[]
+  location    Locations[]
 }
 
 enum Status {
