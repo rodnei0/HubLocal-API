@@ -33,11 +33,10 @@ model Companies {
 
 model Locations {
   id           Int            @id @default(autoincrement())
-  name         String         @unique
-  description  String
-  address      Addresses      @relation(fields: [adressId], references: [id])
-  adressId     Int
-  company      Companies      @relation(fields: [companyId], references: [id])
+  name         String
+  address      Addresses      @relation(fields: [addressId], references: [id])
+  addressId    Int
+  company      Companies      @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId    Int
   responsibles Responsibles[]
   Ticket       Tickets[]
@@ -84,7 +83,7 @@ model Addresses {
   district    String
   city        String
   state       String
-  zipcode     String         @unique
+  zipcode     String
   responsible Responsibles[]
   location    Locations[]
 }

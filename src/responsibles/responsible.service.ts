@@ -19,6 +19,7 @@ export class ResponsibleService {
         cpf: data.cpf,
         companyId: data.companyId,
         addressId: address.id,
+        locationId: data.locationId,
       },
     });
   }
@@ -39,6 +40,7 @@ export class ResponsibleService {
         cpf: data.cpf,
         companyId: data.companyId,
         addressId: address.id,
+        locationId: data.locationId,
       },
       create: {
         name: data.name,
@@ -46,6 +48,7 @@ export class ResponsibleService {
         cpf: data.cpf,
         companyId: data.companyId,
         addressId: address.id,
+        locationId: data.locationId,
       },
     });
   }
@@ -59,18 +62,8 @@ export class ResponsibleService {
   }
 
   async createAddress(addressData: AddressData) {
-    return await this.prisma.addresses.upsert({
-      where: {
-        zipcode: addressData.cep,
-      },
-      update: {
-        city: addressData.localidade,
-        district: addressData.bairro,
-        number: addressData.complemento,
-        state: addressData.uf,
-        street: addressData.logradouro,
-      },
-      create: {
+    return await this.prisma.addresses.create({
+      data: {
         city: addressData.localidade,
         district: addressData.bairro,
         number: addressData.complemento,
@@ -79,5 +72,25 @@ export class ResponsibleService {
         zipcode: addressData.cep,
       },
     });
+    // return await this.prisma.addresses.upsert({
+    //   where: {
+    //     zipcode: addressData.cep,
+    //   },
+    //   update: {
+    //     city: addressData.localidade,
+    //     district: addressData.bairro,
+    //     number: addressData.complemento,
+    //     state: addressData.uf,
+    //     street: addressData.logradouro,
+    //   },
+    //   create: {
+    //     city: addressData.localidade,
+    //     district: addressData.bairro,
+    //     number: addressData.complemento,
+    //     state: addressData.uf,
+    //     street: addressData.logradouro,
+    //     zipcode: addressData.cep,
+    //   },
+    // });
   }
 }
