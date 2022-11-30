@@ -54,4 +54,15 @@ export class AuthService {
       },
     });
   }
+
+  async getUsers(): Promise<{ email: string }[] | null> {
+    const response = await this.prisma.users.findMany({
+      select: {
+        id: true,
+        email: true,
+      },
+    });
+
+    return response;
+  }
 }

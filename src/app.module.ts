@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { CompanyModule } from './companies/company.module';
 import { ResponsibleModule } from './responsibles/responsible.module';
 import { LocationModule } from './locations/location.module';
+import { TicketModule } from './tickets/ticket.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { LocationModule } from './locations/location.module';
     CompanyModule,
     LocationModule,
     ResponsibleModule,
+    TicketModule,
   ],
   controllers: [AppController],
   providers: [],

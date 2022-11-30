@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Responsibles } from '@prisma/client';
 import { CreateResponsibleDto } from './dtos/responsible-dto';
 import { AddressData, getAddress } from 'src/utils/getAddress';
@@ -10,6 +10,7 @@ export class ResponsibleService {
 
   async createResponsible(data: CreateResponsibleDto): Promise<Responsibles> {
     const addressData = await getAddress(data.cep);
+    if (!addressData.cep) throw new NotFoundException('CEP não localizado!');
     const address = await this.createAddress(addressData);
 
     return this.prisma.responsibles.create({
@@ -28,6 +29,7 @@ export class ResponsibleService {
     data: CreateResponsibleDto,
   ): Promise<Responsibles | null> {
     const addressData = await getAddress(data.cep);
+    if (!addressData.cep) throw new NotFoundException('CEP não localizado!');
     const address = await this.createAddress(addressData);
 
     return this.prisma.responsibles.upsert({
